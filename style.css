@@ -844,29 +844,118 @@ footer {
 .product-card:nth-child(12) { animation-delay: .48s; }
 
 /* ─── RESPONSIVE ─── */
+
+/* Tablet */
 @media (max-width: 900px) {
-  .header-inner { padding: 0 24px; }
-  .hero { flex-direction: column; padding: 48px 24px 36px; gap: 32px; }
-  .hero-visual { width: 220px; height: 220px; }
-  .hero-emoji  { font-size: 80px; }
-  .hero-title  { font-size: 40px; }
-  .filter-inner { padding: 0 24px; }
-  .section { padding: 32px 24px 60px; }
-  .product-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
-  .footer-inner { padding: 0 24px; flex-wrap: wrap; gap: 12px; }
-  .footer-links { margin-left: 0; }
+  :root { --header-h: 68px; }
+
+  .header-inner { padding: 0 20px; }
+  .logo-name    { font-size: 26px; }
+
+  /* Hero — ซ้อนแนวตั้ง จัดกลาง */
+  .hero {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+    padding: 40px 20px 32px;
+    gap: 28px;
+  }
+  .hero-content  { width: 100%; max-width: 520px; }
+  .hero-desc     { max-width: 100%; margin-left: auto; margin-right: auto; }
+  .hero-badges   { justify-content: center; }
+  .hero-visual   { width: 180px; height: 180px; }
+  .hero-emoji    { font-size: 72px; }
+  .hero-title    { font-size: 38px; }
+
+  /* Filter */
+  .filter-inner  { padding: 0 20px; gap: 6px; }
+
+  /* Section + Grid */
+  .section       { padding: 28px 20px 56px; }
+  .product-grid  { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+  /* Footer */
+  .footer-inner  {
+    padding: 0 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+  .footer-links  { margin-left: 0; }
+  .footer-brand  { align-items: center; display: flex; flex-direction: column; }
 }
 
+/* Mobile */
 @media (max-width: 560px) {
-  .logo-name { font-size: 24px; }
-  .hero-title { font-size: 32px; }
-  .product-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-  .popup-buttons { grid-template-columns: 1fr; }
-  .popup-name { font-size: 22px; }
+  :root { --header-h: 62px; }
+
+  /* Header — compact */
+  .header-inner  { padding: 0 16px; }
+  .logo-tag      { display: none; }
+  .logo-name     { font-size: 22px; }
+  .logo-sub      { font-size: 11px; }
+  .nav-link:not(.nav-cta) { display: none; } /* ซ่อนลิงก์ที่ไม่ใช่ CTA */
+  .nav-cta       { padding: 7px 16px; font-size: 12px; }
+
+  /* Hero */
+  .hero          { padding: 32px 16px 24px; gap: 20px; }
+  .hero-title    { font-size: 30px; }
+  .hero-label    { font-size: 13px; }
+  .hero-desc     { font-size: 13px; }
+  .hero-badge    { font-size: 11px; padding: 6px 12px; }
+  .hero-visual   { width: 150px; height: 150px; }
+  .hero-emoji    { font-size: 58px; }
+
+  /* Filter — scroll แนวนอน ไม่ขึ้นบรรทัดใหม่ */
+  .filter-bar    { overflow-x: auto; }
+  .filter-inner  {
+    padding: 0 16px;
+    min-width: max-content;
+    gap: 6px;
+  }
+  .filter-btn    { padding: 6px 14px; font-size: 12px; white-space: nowrap; }
+  .filter-count  { white-space: nowrap; }
+
+  /* Section + Grid */
+  .section       { padding: 20px 16px 48px; }
+  .product-grid  { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+  /* Card — compact ขึ้น */
+  .card-body     { padding: 12px 14px 14px; }
+  .card-name     { font-size: 14px; }
+  .card-sub      { font-size: 11px; margin-bottom: 8px; }
+  .card-price    { font-size: 18px; }
+
+  /* Popup — เต็มจอล่าง (bottom sheet style) */
+  .overlay       { align-items: flex-end; padding: 0; }
+  .popup {
+    width: 100%;
+    max-width: 100%;
+    max-height: 92vh;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(40px);
+  }
+  .overlay.active .popup { transform: translateY(0); }
+
+  .popup-img     { border-radius: 22px 22px 0 0; aspect-ratio: 4/3; }
+  .popup-body    { padding: 18px 20px 32px; }
+  .popup-name    { font-size: 22px; }
+  .popup-price-val { font-size: 28px; }
+  .popup-buttons { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .btn-platform  { padding: 12px 14px; font-size: 13px; }
+
+  /* Footer */
+  .footer-inner  { padding: 0 16px; }
+  .footer-links  { gap: 2px; }
 }
 
-@media (max-width: 380px) {
-  .product-grid { grid-template-columns: 1fr; }
+/* Small mobile */
+@media (max-width: 360px) {
+  .hero-title    { font-size: 26px; }
+  .product-grid  { gap: 8px; }
+  .card-name     { font-size: 13px; }
+  .popup-buttons { grid-template-columns: 1fr; }
 }
 
 /* ─── REDUCED MOTION ─── */
