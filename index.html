@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="YUMEAMI — ตุ๊กตาโครเชต์ทำมือ ถักด้วยความรักทุกตัว" />
+  <title>YUMEAMI — ตุ๊กตาโครเชต์</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,400;1,600&family=Noto+Sans+Thai:wght@300;400;500;600&family=Caveat:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header id="siteHeader">
+    <div class="header-inner">
+      <a href="#" class="logo" aria-label="YUMEAMI หน้าแรก">
+        <div class="logo-tag">✦ handmade with love</div>
+        <div class="logo-name">YUMEAMI</div>
+        <div class="logo-sub">ตุ๊กตาโครเชต์ทำมือ</div>
+      </a>
+      <nav aria-label="เมนูหลัก">
+        <a href="#products" class="nav-link">สินค้า</a>
+        <a href="#contact" class="nav-link nav-cta">ติดต่อเรา</a>
+      </nav>
+    </div>
+    <!-- Progress bar for page load -->
+    <div class="load-bar" id="loadBar" aria-hidden="true"></div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="แบนเนอร์หลัก">
+    <div class="hero-content">
+      <h1 class="hero-title">ตุ๊กตาโครเชต์<br><em>ถักเอง</em> ทุกตัว</h1>
+      <p class="hero-desc">เลือกสี เลือกขนาด สั่งทำพิเศษได้ ทุกตัวถักด้วยมือและความรัก</p>
+      <div class="hero-badges">
+        <div class="hero-badge">📦 ส่งทั่วไทย เริ่ม 40฿</div>
+        <div class="hero-badge">✨ สั่งทำพิเศษได้</div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-blob">
+        <span class="hero-emoji">😽</span>
+      </div>
+      <div class="yarn-deco yarn-1">🧶</div>
+      <div class="yarn-deco yarn-2">🌸</div>
+      <div class="yarn-deco yarn-3">⭐</div>
+    </div>
+  </section>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar" id="products" role="navigation" aria-label="กรองสินค้า">
+    <div class="filter-inner">
+      <button class="filter-btn active" data-filter="all">ทั้งหมด</button>
+      <button class="filter-btn" data-filter="ready">พร้อมส่ง</button>
+      <button class="filter-btn" data-filter="preorder">พรีออเดอร์</button>
+      <div class="filter-count" id="filterCount" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS SECTION -->
+  <main class="section" aria-label="รายการสินค้า">
+    <!-- Skeleton loading (shown while fetching) -->
+    <div class="product-grid" id="skeletonGrid" aria-hidden="true" aria-label="กำลังโหลด">
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+      <div class="skeleton-card"><div class="sk-img"></div><div class="sk-body"><div class="sk-line sk-lg"></div><div class="sk-line sk-sm"></div><div class="sk-line sk-md"></div></div></div>
+    </div>
+
+    <div id="errorState" class="error-state" style="display:none" role="alert"></div>
+    <div class="product-grid" id="productGrid" style="display:none"></div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer id="contact">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-name">YUMEAMI</div>
+        <div class="footer-tag">ถักด้วยความรักทุกตัว 🧶</div>
+      </div>
+      <div class="footer-links">
+        <a href="https://shopee.co.th/shop/656448757" class="footer-link">Shopee</a>
+        <a href="https://lin.ee/SPEEpAf" class="footer-link">LINE</a>
+        <a href="https://www.instagram.com/yume.amigurumi?igsh=MWo3YnhwcHVteG1nZg==" class="footer-link">Instagram</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- POPUP OVERLAY -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-label="รายละเอียดสินค้า" aria-hidden="true">
+    <div class="popup" id="popup">
+      <button class="popup-close" id="popupClose" aria-label="ปิด">✕</button>
+
+      <div class="popup-gallery" id="popupGallery">
+        <div class="popup-img" id="popupImg">
+          <img id="popupImgEl" src="" alt="" style="display:none" />
+          <span class="popup-emoji" id="popupEmoji" aria-hidden="true"></span>
+        </div>
+        <div class="popup-thumbs" id="popupThumbs" role="list" aria-label="รูปภาพเพิ่มเติม"></div>
+      </div>
+
+      <div class="popup-body">
+        <div class="popup-top">
+          <div class="popup-status" id="popupStatus"></div>
+          <div class="popup-collection" id="popupCollection"></div>
+        </div>
+        <h2 class="popup-name" id="popupName"></h2>
+        <p class="popup-desc" id="popupDesc"></p>
+        <div class="popup-details" id="popupDetails" role="list"></div>
+        <div class="popup-price-row">
+          <span class="popup-price-label">ราคา</span>
+          <span class="popup-price-val" id="popupPrice"></span>
+        </div>
+        <div class="popup-buttons">
+          <a href="#" class="btn-platform btn-shopee" id="shopeeBtn" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon" aria-hidden="true">🛍️</span>
+            <span>สั่งซื้อใน Shopee</span>
+          </a>
+          <a href="#" class="btn-platform btn-line" id="lineBtn" target="_blank" rel="noopener noreferrer">
+            <span class="btn-icon" aria-hidden="true">💬</span>
+            <span>สั่งซื้อผ่าน LINE</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
