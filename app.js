@@ -28,8 +28,9 @@
 
    🔒 Security:
      - ทุก text ถูก escape ก่อนแทรก DOM
-     - URL ที่ใช้ใน href ตรวจสอบ protocol ก่อน
-     - ไม่มี innerHTML จาก Sheet โดยตรง (ยกเว้น detail chip ที่ escape แล้ว)
+     - URL ที่ใช้ใน href ตรวจสอบ protocol ก่อน (https: และ line: เท่านั้น)
+     - ไม่อนุญาต http: เพื่อป้องกัน mixed content
+     - ไม่มี innerHTML จาก Sheet โดยตรง
    ============================================= */
 
 "use strict";
@@ -42,7 +43,7 @@ const CONFIG = Object.freeze({
   DEFAULT_BG:   "#f9ede6",
   CACHE_KEY:    "yumeami_products_v2",
   CACHE_TTL_MS: 5 * 60 * 1000,   // 5 นาที
-  ALLOWED_PROTOCOLS: ["https:", "http:", "line:"],
+  ALLOWED_PROTOCOLS: ["https:", "line:"],
   MAX_NAME_LEN: 120,
   MAX_DESC_LEN: 800,
 });
@@ -118,11 +119,11 @@ function resolveImage(raw) {
   const trimmed = raw.trim();
   if (!trimmed) return "";
 
-  // ถ้าเป็น URL เต็ม → ตรวจ protocol
+  // ถ้าเป็น URL เต็ม → ตรวจ protocol (https เท่านั้น)
   if (/^https?:\/\//i.test(trimmed)) {
     try {
       const parsed = new URL(trimmed);
-      if (["https:", "http:"].includes(parsed.protocol)) return parsed.href;
+      if (parsed.protocol === "https:") return parsed.href;
     } catch { /* ไม่ใช่ URL ที่ valid */ }
     return "";
   }
@@ -154,6 +155,19 @@ function loadCache() {
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed.ts !== "number" || !Array.isArray(parsed.data)) return null;
     if (Date.now() - parsed.ts > CONFIG.CACHE_TTL_MS) {
+      sessionStorage.removeItem(CONFIG.CACHE_KEY);
+      return null;
+    }
+    // Validate schema: ตรวจว่าทุก item มี field ที่จำเป็น และ type ถูกต้อง
+    const isValid = parsed.data.every(p =>
+      p && typeof p === "object" &&
+      typeof p.name === "string" &&
+      typeof p.price === "number" && isFinite(p.price) &&
+      typeof p.status === "string" &&
+      Array.isArray(p.details) &&
+      Array.isArray(p.subImages)
+    );
+    if (!isValid) {
       sessionStorage.removeItem(CONFIG.CACHE_KEY);
       return null;
     }
@@ -237,13 +251,15 @@ async function loadProducts() {
 
 /* ─── PARSE CSV ─── */
 function parseCSV(text) {
-  const lines = text.trim().split(/\r?\n/);
-  if (lines.length < 2) return [];
+  // รวม multiline quoted fields ก่อน split เป็น rows
+  const rows = splitCSVRows(text.trim());
+  if (rows.length < 2) return [];
 
-  return lines.slice(1).map((line) => {
+  return rows.slice(1).map((line) => {
     const c = splitCSVLine(line);
 
-    const price = parseFloat((c[3] || "0").replace(/[^0-9.]/g, "")) || 0;
+    const price = parseFloat((c[3] || "0").replace(/[^0-9.]/g, ""));
+    const safePrice = isFinite(price) && price >= 0 ? price : 0;
 
     // Truncate ฟิลด์ text เพื่อป้องกันข้อมูลที่ยาวผิดปกติ
     const name = String(c[0] || "").slice(0, CONFIG.MAX_NAME_LEN);
@@ -253,7 +269,7 @@ function parseCSV(text) {
       name:      name,
       sub:       String(c[1] || "").slice(0, 80),
       status:    String(c[2] || "ready").trim().toLowerCase(),
-      price:     price,
+      price:     safePrice,
       desc:      desc,
       details:   String(c[5] || "").split("|").map(s => s.trim()).filter(Boolean).slice(0, 10),
       emoji:     String(c[6] || "🧸").slice(0, 8),
@@ -266,6 +282,29 @@ function parseCSV(text) {
       lineUrl:   String(c[11] || "#").trim(),
     };
   }).filter(p => p.name.length > 0);
+}
+
+/* แยก CSV text เป็น rows โดยรองรับ newline ภายใน quoted field */
+function splitCSVRows(text) {
+  const rows = [];
+  let cur = "";
+  let inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (ch === '"') {
+      if (inQ && text[i + 1] === '"') { cur += '"'; i++; }
+      else inQ = !inQ;
+      cur += ch;
+    } else if ((ch === "\n" || (ch === "\r" && text[i + 1] === "\n")) && !inQ) {
+      if (ch === "\r") i++; // skip \n of \r\n
+      rows.push(cur);
+      cur = "";
+    } else {
+      cur += ch;
+    }
+  }
+  if (cur) rows.push(cur);
+  return rows;
 }
 
 /* RFC-compliant CSV splitter (รองรับ quoted fields + escaped quotes) */
@@ -320,6 +359,9 @@ function renderGrid() {
   grid.style.display          = "";
   filterCount.textContent     = products.length + " ชิ้น";
 
+  // Clear grid ก่อน render ใหม่ (ป้องกัน card ซ้ำเมื่อ retry)
+  grid.innerHTML = "";
+
   products.forEach((p, i) => {
     const card = document.createElement("article");
     card.className       = "product-card";
@@ -327,7 +369,7 @@ function renderGrid() {
     card.dataset.status  = p.status;
     card.tabIndex        = 0;
     card.setAttribute("role", "button");
-    card.setAttribute("aria-label", "ดูรายละเอียด " + escapeHTML(p.name));
+    card.setAttribute("aria-label", "ดูรายละเอียด " + p.name);
 
     const st     = STATUS_MAP[p.status] || STATUS_MAP["ready"];
     const imgSrc = resolveImage(p.image);
@@ -350,7 +392,7 @@ function renderGrid() {
       const img = document.createElement("img");
       img.className   = "card-photo";
       img.src         = imgSrc;
-      img.alt         = escapeHTML(p.name);
+      img.alt         = p.name;
       img.loading     = "lazy";
       img.decoding    = "async";
       img.onerror     = function() {
@@ -440,7 +482,7 @@ function openPopup(i) {
   // Main image
   if (allImgs.length > 0) {
     popupImgEl.src          = allImgs[0];
-    popupImgEl.alt          = escapeHTML(p.name);
+    popupImgEl.alt          = p.name;
     popupImgEl.style.display = "block";
     popupEmoji.style.display = "none";
     popupImgEl.onerror = function() {
@@ -467,7 +509,7 @@ function openPopup(i) {
 
       const tImg   = document.createElement("img");
       tImg.src     = src;
-      tImg.alt     = escapeHTML(p.name) + " รูปที่ " + (idx + 1);
+      tImg.alt     = p.name + " รูปที่ " + (idx + 1);
       tImg.loading = "lazy";
       thumb.appendChild(tImg);
 
